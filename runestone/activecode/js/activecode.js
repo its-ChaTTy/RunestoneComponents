@@ -21,7 +21,7 @@ import "codemirror/mode/javascript/javascript.js";
 import "codemirror/mode/sql/sql.js";
 import "codemirror/mode/clike/clike.js";
 import "codemirror/mode/octave/octave.js";
-import "./../css/activecode.css";
+import "./../css/activecode.less";
 import "codemirror/lib/codemirror.css";
 import "./skulpt.min.js";
 import "./skulpt-stdlib.js";
