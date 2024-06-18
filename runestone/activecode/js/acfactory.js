@@ -3,6 +3,7 @@ import JSActiveCode from "./activecode_js.js";
 import HTMLActiveCode from "./activecode_html.js";
 import SQLActiveCode from "./activecode_sql.js";
 import BrythonActiveCode from "./activecode_brython.js";
+import PyScriptActiveCode from "./activecode_pyscript.js";
 import LiveCode from "./livecode.js";
 import {
     TimedActiveCode,
@@ -11,6 +12,7 @@ import {
     TimedHTMLActiveCode,
     TimedSQLActiveCode,
     TimedBrythonActiveCode,
+    TimedPyScriptActiveCode,
 } from "./timed_activecode";
 import "../../common/js/jquery.highlight.js";
 
@@ -32,12 +34,16 @@ export default class ACFactory {
         if (lang === undefined) {
             lang = $(opts.orig).find("[data-lang]").data("lang");
         }
-        var text_area = $(opts.orig).find("textarea")[0]
+        var text_area = $(opts.orig).find("textarea")[0];
         var python3_interpreter = $(text_area).attr("data-python3_interpreter");
         var output_height = $(text_area).attr("data-output_height");
+
         if (opts.timed == true) {
-            if(python3_interpreter==="brython"){
-                return new TimedBrythonActiveCode(opts);   
+            if (python3_interpreter === "pyscript") {
+                return new TimedPyScriptActiveCode(opts);
+            }
+            if (python3_interpreter === "brython") {
+                return new TimedBrythonActiveCode(opts);
             }
             if (lang === "python") {
                 return new TimedActiveCode(opts);
@@ -58,10 +64,12 @@ export default class ACFactory {
                 return new TimedActiveCode(opts);
             }
         } else {
-            if ((lang ==="python3") && (python3_interpreter === "brython")){
-                return new BrythonActiveCode(opts);   
+            if ((lang === "python3") && (python3_interpreter === "pyscript")) {
+                return new PyScriptActiveCode(opts);
             }
-            else if (lang === "javascript") {
+            if ((lang === "python3") && (python3_interpreter === "brython")) {
+                return new BrythonActiveCode(opts);
+            } else if (lang === "javascript") {
                 return new JSActiveCode(opts);
             } else if (lang === "htmlmixed") {
                 return new HTMLActiveCode(opts);
@@ -79,6 +87,7 @@ export default class ACFactory {
             }
         }
     }
+
     // used by web2py controller(s)
     static addActiveCodeToDiv(outerdivid, acdivid, sid, initialcode, language) {
         var thepre, newac;
@@ -108,9 +117,11 @@ export default class ACFactory {
             newac.editor.refresh();
         }, 500);
     }
+
     static createActiveCodeFromOpts(opts) {
         return ACFactory.createActiveCode(opts.orig, opts.lang, opts);
     }
+
     static createScratchActivecode() {
         /* set up the scratch Activecode editor in the search menu */
         // use the URL to assign a divid - each page should have a unique Activecode block id.
@@ -141,10 +152,6 @@ export default class ACFactory {
                   <div data-component="activecode" id=${divid}>
                   <div id=${divid}_question class="ac_question"><p>Use this area for writing code or taking notes.</p></div>
                   <textarea data-codelens="true" data-lang="${lang}" ${stdin}>
-
-
-
-
                   </textarea>
                   </div>
                   </div>
@@ -160,6 +167,7 @@ export default class ACFactory {
             });
         });
     }
+
     static toggleScratchActivecode() {
         var divid = "ac_modal_" + eBookConfig.scratchDiv;
         var div = $("#" + divid);
