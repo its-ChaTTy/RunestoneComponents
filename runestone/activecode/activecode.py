@@ -163,6 +163,7 @@ class ActiveCode(RunestoneIdDirective):
        :dburl: url to load database for sql mode
        :showlastsql: -- Only show the last sql result in output
        :python3_interpreter: brython (uses brython as interpreter of python3)
+       :python3_interpreter: pyscript (uses pyscript as interpreter of python3)
        :output_height: 200px
 
         If this is a homework problem instead of an example in the text
