@@ -38,6 +38,10 @@ export default class PyScriptActiveCode extends ActiveCode {
             </style>
         </head>
         <body>
+            <py-config>
+                terminal = false
+                packages = [ "pandas", "numpy", "matplotlib"]
+            </py-config>
             <pre id="consolePre">
                 <code id="consoleCode"></code>
             </pre>
@@ -71,7 +75,7 @@ export default class PyScriptActiveCode extends ActiveCode {
                 preElem.style.border = "1px solid #ebccd1"
                 logger.classList.add("python")
 
-        # Example usage
+        # usage
         my_exec("""${prog}
         """)
             </py-script>
