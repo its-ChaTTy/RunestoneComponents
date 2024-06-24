@@ -46,38 +46,38 @@ export default class PyScriptActiveCode extends ActiveCode {
                 <code id="consoleCode"></code>
             </pre>
             <py-repl>
-        import sys
-        from js import document
-        logger = document.getElementById('consoleCode')
-        preElem = document.getElementById('consolePre')
+                import sys
+                from js import document
+                logger = document.getElementById('consoleCode')
+                preElem = document.getElementById('consolePre')
 
-        class NewOut:
-            def write(self, data):
-                logger.innerHTML += str(data)
-        sys.stderr = sys.stdout = NewOut()
+                class NewOut:
+                    def write(self, data):
+                        logger.innerHTML += str(data)
+                sys.stderr = sys.stdout = NewOut()
 
-        def my_exec(code):
-            try:
-                exec(code)
-                preElem.style.visibility = "visible"
-                preElem.style.bottom = "5px"
-                logger.classList.add("plaintext")
-            except Exception as err:
-                error_class = err.__class__.__name__
-                detail = err.args[0]
-                line_number = ""  # PyScript does not currently expose line numbers
-                result = f"'{error_class}': {detail} {line_number}"
-                print(result)
-                # Styling the pre element for error
-                preElem.style.visibility = "visible"
-                preElem.style.top = "5px"
-                preElem.style.backgroundColor = "#f2dede"
-                preElem.style.border = "1px solid #ebccd1"
-                logger.classList.add("python")
+                def my_exec(code):
+                    try:
+                        exec(code)
+                        preElem.style.visibility = "visible"
+                        preElem.style.bottom = "5px"
+                        logger.classList.add("plaintext")
+                    except Exception as err:
+                        error_class = err.__class__.__name__
+                        detail = err.args[0]
+                        line_number = ""  # PyScript does not currently expose line numbers
+                        result = f"'{error_class}': {detail} {line_number}"
+                        print(result)
+                        # Styling the pre element for error
+                        preElem.style.visibility = "visible"
+                        preElem.style.top = "5px"
+                        preElem.style.backgroundColor = "#f2dede"
+                        preElem.style.border = "1px solid #ebccd1"
+                        logger.classList.add("python")
 
-        # usage
-        my_exec("""${prog}
-        """)
+                # usage
+                my_exec("""${prog}
+                """)
             </py-repl>
             <script>
                 hljs.highlightAll();
