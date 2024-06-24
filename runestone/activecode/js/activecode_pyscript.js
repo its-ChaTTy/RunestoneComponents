@@ -45,7 +45,7 @@ export default class PyScriptActiveCode extends ActiveCode {
             <pre id="consolePre">
                 <code id="consoleCode"></code>
             </pre>
-            <py-script>
+            <py-repl>
         import sys
         from js import document
         logger = document.getElementById('consoleCode')
@@ -78,7 +78,7 @@ export default class PyScriptActiveCode extends ActiveCode {
         # usage
         my_exec("""${prog}
         """)
-            </py-script>
+            </py-repl>
             <script>
                 hljs.highlightAll();
             </script>
