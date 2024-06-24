@@ -23,7 +23,7 @@ export default class PyScriptActiveCode extends ActiveCode {
         $(this.outDiv).show({ duration: 700, queue: false });
     
         // Properly escape and preserve the user's code indentation
-        userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`').split('\n').map(line => '                ' + line).join('\n');
+        userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
     
         const prog = `
             <html>
@@ -49,7 +49,7 @@ export default class PyScriptActiveCode extends ActiveCode {
                 <pre id="consolePre">
                     <code id="consoleCode"></code>
                 </pre>
-                <py-repl>
+                <py-script output="consoleCode">
                     import sys
                     from js import document
                     logger = document.getElementById('consoleCode')
@@ -81,7 +81,7 @@ export default class PyScriptActiveCode extends ActiveCode {
     
                     # usage
                     my_exec(\`${userCode}\`)
-                </py-repl>
+                </py-script>
                 <script>
                     hljs.highlightAll();
                 </script>
@@ -91,6 +91,7 @@ export default class PyScriptActiveCode extends ActiveCode {
     
         this.output.srcdoc = prog;
     }
+    
     
     
     createOutput() {
