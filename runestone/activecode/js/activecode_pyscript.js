@@ -23,70 +23,78 @@ export default class PyScriptActiveCode extends ActiveCode {
         $(this.outDiv).show({ duration: 700, queue: false });
     
         // Properly escape and preserve the user's code indentation
-        userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+        // userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
     
-        const prog = `
-            <html>
-            <head>
-                <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-                <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-                <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/default.min.css">
-                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
-                <style>
-                    pre {
-                        position: absolute; font-size: 13px; width: 94%; padding: 9.5px; line-height: 1.42857143; border: 1px ; border-radius: 4px;
-                    }
-                    code {
-                        border: 1px solid #ccc; border-radius: 4px;
-                    }
-                </style>
-            </head>
-            <body>
-                <py-config>
-                    terminal = false
-                    packages = [ "pandas", "numpy", "matplotlib"]
-                </py-config>
-                <pre id="consolePre">
-                    <code id="consoleCode"></code>
-                </pre>
-                <py-script output="consoleCode">
-                    import sys
-                    from js import document
-                    logger = document.getElementById('consoleCode')
-                    preElem = document.getElementById('consolePre')
+        prog = `
+        <html>
+        <head>
+            <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+            <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+            <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/default.min.css">
+            <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
+            <style>
+                pre {
+                    position: absolute; font-size: 13px; width: 94%; padding: 9.5px; line-height: 1.42857143; border: 1px ; border-radius: 4px;
+                }
+                code {
+                    border: 1px solid #ccc; border-radius: 4px;
+                }
+            </style>
+        </head>
+        <body>
+            <py-config>
+                terminal = false
+                packages = [ "pandas", "numpy", "matplotlib"]
+            </py-config>
+            <pre id="consolePre">
+                <code id="consoleCode"></code>
+            </pre>
+            <py-script output="consoleCode">
+import sys
+from js import document
+logger = document.getElementById('consoleCode')
+preElem = document.getElementById('consolePre')
     
-                    class NewOut:
-                        def write(self, data):
-                            logger.innerHTML += str(data)
-                    sys.stderr = sys.stdout = NewOut()
+class NewOut:
+    def write(self, data):
+        logger.innerHTML += str(data)
+sys.stderr = sys.stdout = NewOut()
     
-                    def my_exec(code):
-                        try:
-                            exec(code)
-                            preElem.style.visibility = "visible"
-                            preElem.style.bottom = "5px"
-                            logger.classList.add("plaintext")
-                        except Exception as err:
-                            error_class = err.__class__.__name__
-                            detail = err.args[0]
-                            line_number = ""  # PyScript does not currently expose line numbers
-                            result = f"'{error_class}': {detail} {line_number}"
-                            print(result)
-                            # Styling the pre element for error
-                            preElem.style.visibility = "visible"
-                            preElem.style.top = "5px"
-                            preElem.style.backgroundColor = "#f2dede"
-                            preElem.style.border = "1px solid #ebccd1"
-                            logger.classList.add("python")
+def my_exec(code):
+    try:
+        exec(code)
+        preElem.style.visibility = "visible"
+        preElem.style.bottom = "5px"
+        logger.classList.add("pla   intext")
+    except Exception as err:
+        error_class = err.__class__.__name__
+        detail = err.args[0]
+        # When errors don't specify a line
+        try:
+            line_number = f"at line {traceback.extract_tb(tb)[-1][1]}"
+        except:
+            line_number = ""
+    else:
+        return
+
+    # This is only done if an Exception was catched
+    result = f"'{error_class}': {detail} {line_number}"
+    print(result)    
+    # Styling the pre element for error
+    preElem.style.visibility = "visible"
+    preElem.style.top = "5px"
+    preElem.style.backgroundColor = "#f2dede"
+    preElem.style.border = "1px solid #ebccd1"
+    logger.classList.add("python")
     
-                    # usage
-                    my_exec(\`${userCode}\`)
-                </py-script>
-                <script>
-                    hljs.highlightAll();
-                </script>
-            </body>
-            </html>
+my_prog = ${JSON.stringify(prog)}
+my_exec(my_prog)
+            </py-script>
+            <script>
+                hljs.highlightAll();
+            </script>
+        </body>
+        </html>
         `;
     
         this.output.srcdoc = prog;
