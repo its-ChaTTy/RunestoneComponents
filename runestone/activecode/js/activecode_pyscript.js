@@ -23,9 +23,9 @@ export default class PyScriptActiveCode extends ActiveCode {
         $(this.outDiv).show({ duration: 700, queue: false });
     
         // Properly escape and preserve the user's code indentation
-        // userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+        userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`').split('\n').map(line => '                ' + line).join('\n');
     
-        prog = `
+        const prog = `
         <html>
         <head>
             <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
@@ -49,7 +49,7 @@ export default class PyScriptActiveCode extends ActiveCode {
             <pre id="consolePre">
                 <code id="consoleCode"></code>
             </pre>
-            <py-script output="consoleCode">
+            <py-repl>
 import sys
 from js import document
 logger = document.getElementById('consoleCode')
@@ -58,38 +58,30 @@ preElem = document.getElementById('consolePre')
 class NewOut:
     def write(self, data):
         logger.innerHTML += str(data)
-sys.stderr = sys.stdout = NewOut()
+    sys.stderr = sys.stdout = NewOut()
     
-def my_exec(code):
-    try:
-        exec(code)
-        preElem.style.visibility = "visible"
-        preElem.style.bottom = "5px"
-        logger.classList.add("pla   intext")
-    except Exception as err:
-        error_class = err.__class__.__name__
-        detail = err.args[0]
-        # When errors don't specify a line
+    def my_exec(code):
         try:
-            line_number = f"at line {traceback.extract_tb(tb)[-1][1]}"
-        except:
-            line_number = ""
-    else:
-        return
-
-    # This is only done if an Exception was catched
-    result = f"'{error_class}': {detail} {line_number}"
-    print(result)    
-    # Styling the pre element for error
-    preElem.style.visibility = "visible"
-    preElem.style.top = "5px"
-    preElem.style.backgroundColor = "#f2dede"
-    preElem.style.border = "1px solid #ebccd1"
-    logger.classList.add("python")
+            exec(code)
+            preElem.style.visibility = "visible"
+            preElem.style.bottom = "5px"
+            logger.classList.add("plaintext")
+        except Exception as err:
+            error_class = err.__class__.__name__
+            detail = err.args[0]
+            line_number = ""  # PyScript does not currently expose line numbers
+            result = f"'{error_class}': {detail} {line_number}"
+            print(result)
+            # Styling the pre element for error
+            preElem.style.visibility = "visible"
+            preElem.style.top = "5px"
+            preElem.style.backgroundColor = "#f2dede"
+            preElem.style.border = "1px solid #ebccd1"
+            logger.classList.add("python")
     
-my_prog = ${JSON.stringify(prog)}
-my_exec(my_prog)
-            </py-script>
+# usage
+my_exec(\`${userCode}\`)
+            </py-repl>
             <script>
                 hljs.highlightAll();
             </script>
@@ -99,7 +91,6 @@ my_exec(my_prog)
     
         this.output.srcdoc = prog;
     }
-    
     
     
     createOutput() {
