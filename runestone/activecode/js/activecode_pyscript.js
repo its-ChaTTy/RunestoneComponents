@@ -10,7 +10,7 @@ export default class PyScriptActiveCode extends ActiveCode {
     }
 
     async runProg() {
-        var userCode = await this.buildProg(true);
+        var prog = await this.buildProg(true);
         let saveCode = "True";
         this.saveCode = await this.manage_scrubber(saveCode);
         $(this.output).text("");
@@ -21,11 +21,7 @@ export default class PyScriptActiveCode extends ActiveCode {
             });
         }
         $(this.outDiv).show({ duration: 700, queue: false });
-    
-        // Properly escape and preserve the user's code indentation
-        userCode = userCode.replace(/\\/g, '\\\\').replace(/`/g, '\\`').split('\n').map(line => '                ' + line).join('\n');
-    
-        const prog = `
+        prog = `
         <html>
         <head>
             <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
@@ -36,7 +32,7 @@ export default class PyScriptActiveCode extends ActiveCode {
                 pre {
                     position: absolute; font-size: 13px; width: 94%; padding: 9.5px; line-height: 1.42857143; border: 1px ; border-radius: 4px;
                 }
-                code {
+                code{
                     border: 1px solid #ccc; border-radius: 4px;
                 }
             </style>
@@ -49,50 +45,49 @@ export default class PyScriptActiveCode extends ActiveCode {
             <pre id="consolePre">
                 <code id="consoleCode"></code>
             </pre>
-            <py-repl>
+            <py-script>
 import sys
 from js import document
 logger = document.getElementById('consoleCode')
 preElem = document.getElementById('consolePre')
-    
+
 class NewOut:
     def write(self, data):
         logger.innerHTML += str(data)
-    sys.stderr = sys.stdout = NewOut()
-    
-    def my_exec(code):
-        try:
-            exec(code)
-            preElem.style.visibility = "visible"
-            preElem.style.bottom = "5px"
-            logger.classList.add("plaintext")
-        except Exception as err:
-            error_class = err.__class__.__name__
-            detail = err.args[0]
-            line_number = ""  # PyScript does not currently expose line numbers
-            result = f"'{error_class}': {detail} {line_number}"
-            print(result)
-            # Styling the pre element for error
-            preElem.style.visibility = "visible"
-            preElem.style.top = "5px"
-            preElem.style.backgroundColor = "#f2dede"
-            preElem.style.border = "1px solid #ebccd1"
-            logger.classList.add("python")
-    
+sys.stderr = sys.stdout = NewOut()
+
+def my_exec(code):
+    try:
+        exec(code)
+        preElem.style.visibility = "visible"
+        preElem.style.bottom = "5px"
+        logger.classList.add("plaintext")
+    except Exception as err:
+        error_class = err.__class__.__name__
+        detail = err.args[0]
+        line_number = ""  # PyScript does not currently expose line numbers
+        result = f"'{error_class}': {detail} {line_number}"
+        print(result)
+        # Styling the pre element for error
+        preElem.style.visibility = "visible"
+        preElem.style.top = "5px"
+        preElem.style.backgroundColor = "#f2dede"
+        preElem.style.border = "1px solid #ebccd1"
+        logger.classList.add("python")
+
 # usage
-my_exec(\`${userCode}\`)
-            </py-repl>
+my_exec("""${prog}
+""")
+            </py-script>
             <script>
                 hljs.highlightAll();
             </script>
         </body>
         </html>
         `;
-    
         this.output.srcdoc = prog;
     }
-    
-    
+
     createOutput() {
         this.alignVertical = true;
         var outDiv = document.createElement("div");
