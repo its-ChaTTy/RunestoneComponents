@@ -3,6 +3,7 @@ import JSActiveCode from "./activecode_js.js";
 import HTMLActiveCode from "./activecode_html.js";
 import SQLActiveCode from "./activecode_sql.js";
 import BrythonActiveCode from "./activecode_brython.js";
+import PyScriptActiveCode from "./activecode_pyscript.js";
 import LiveCode from "./livecode.js";
 import {
     TimedActiveCode,
@@ -11,6 +12,7 @@ import {
     TimedHTMLActiveCode,
     TimedSQLActiveCode,
     TimedBrythonActiveCode,
+    TimedPyScriptActiveCode,
 } from "./timed_activecode";
 import "../../common/js/jquery.highlight.js";
 
@@ -39,6 +41,9 @@ export default class ACFactory {
             if(python3_interpreter==="brython"){
                 return new TimedBrythonActiveCode(opts);   
             }
+            if(python3_interpreter==="pyscript"){
+                return new TimedPyScriptActiveCode(opts);
+            }
             if (lang === "python") {
                 return new TimedActiveCode(opts);
             } else if (
@@ -58,7 +63,10 @@ export default class ACFactory {
                 return new TimedActiveCode(opts);
             }
         } else {
-            if ((lang ==="python3") && (python3_interpreter === "brython")){
+            if((lang ==="python3") && (python3_interpreter === "pyscript")){
+                return new PyScriptActiveCode(opts);
+            }
+            else if ((lang ==="python3") && (python3_interpreter === "brython")){
                 return new BrythonActiveCode(opts);   
             }
             else if (lang === "javascript") {
